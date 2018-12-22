@@ -43,6 +43,13 @@
             android:text="@string/unbind_service"
             android:backgroundTint="@color/colorAccent"
             android:textColor="@android:color/white"/>
+        <Button
+            android:id="@+id/linear_stop_service_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/stop_service"
+            android:backgroundTint="@color/colorAccent"
+            android:textColor="@android:color/white"/>
 
 
     </LinearLayout>

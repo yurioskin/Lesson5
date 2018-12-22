@@ -1,16 +1,17 @@
 <resources>
     <string name="app_name">Lesson5</string>
-    <string name="time">Time</string>
+    <string name="number">Number</string>
     <string name="date">Date</string>
+    <string name="day">Day</string>
+    <string name="time">Time</string>
+    <string name="time_in_milliseconds_tw">Time in milliseconds</string>
     <string name="relative_day_tw">Day</string>
     <string name="bind_service">Bind service</string>
-    <string name="time_in_milliseconds_tw">Time in milliseconds</string>
-    <string name="number">Number</string>
+    <string name="unbind_service">Unbind service</string>
     <string name="start_service">Start service</string>
     <string name="stop_service">Stop service</string>
-    <string name="day">Day</string>
+    <string name="service_is_stopped">Service is stopped</string>
     <string name="color_name">Color name</string>
-    <string name="unbind_service">Unbind service</string>
     <string name="_00_00">00:00</string>
     <string name="_0">0</string>
 

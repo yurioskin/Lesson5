@@ -6,17 +6,17 @@ import android.content.Intent;
 
 public class CustomBroadcastReceiver extends BroadcastReceiver {
 
-    ViewCallback viewCallback;
+    BroadcastCallback mBroadcastCallback;
 
-    CustomBroadcastReceiver(ViewCallback viewCallback){
-        this.viewCallback = viewCallback;
+    CustomBroadcastReceiver(BroadcastCallback broadcastCallback){
+        this.mBroadcastCallback = broadcastCallback;
     }
 
     @Override
     public void onReceive(Context context, Intent intent) {
         //TODO
-        viewCallback.collingBack(intent.getStringExtra(MyService.NAME_COLOR),
-                intent.getIntExtra(MyService.CURRENT_COLOR,0));
+
+        mBroadcastCallback.collingBack(intent);
     }
 
 

@@ -10,16 +10,13 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.support.annotation.Nullable;
-import android.util.ArrayMap;
 import android.util.Pair;
 
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
-import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
 public class MyService extends Service {
@@ -29,6 +26,7 @@ public class MyService extends Service {
     public static final String CHANGE_COLOR = "com.example.oskin.lesson4.key.CHANGE_COLOR";
     public static final String CURRENT_COLOR = "com.example.oskin.lesson4.key.CURRENT_COLOR";
     public static final String NAME_COLOR = "com.example.oskin.lesson4.key.NAME_COLOR";
+    public static final String ACTION_STOP_SERVICE = "com.example.oskin.lesson4.key.STOP_SERVICE";
 
     public static final int MSG_REGISTER_CLIENT = 0x00001;
     public static final int MSG_UNREGISTER_CLIENT = 0x00002;
@@ -52,17 +50,18 @@ public class MyService extends Service {
         @Override
         public void run(){
             try {
-                for (int i = 0; ; i++) {
+                for (; ;) {
                     if (isInterrupted) {
                         stopSelf();
                         return;
                     }
-
+                    
                     indexColor = mRandom.nextInt(6);
                     while (lastColor == indexColor){
                         indexColor = mRandom.nextInt(6);
                     }
                     lastColor = indexColor;
+
                     Intent intent = new Intent(CHANGE_COLOR);
                     intent.putExtra(NAME_COLOR, mColors.get(indexColor).first);
                     intent.putExtra(CURRENT_COLOR, mColors.get(indexColor).second);
@@ -105,7 +104,6 @@ public class MyService extends Service {
 
     @Override
     public void onCreate() {
-        //TODO business logic
         super.onCreate();
         initColors();
         linearThread.start();
@@ -143,6 +141,15 @@ public class MyService extends Service {
             }
         }
     }
+
+    @Override
+    public void onDestroy() {
+        isInterrupted = true;
+        Intent intent = new Intent(ACTION_STOP_SERVICE);
+        sendBroadcast(intent);
+        super.onDestroy();
+    }
+
     private void initColors() {
         mColors.add(new Pair<>("Red", Color.RED));
         mColors.add(new Pair<>("Cyan", Color.CYAN));

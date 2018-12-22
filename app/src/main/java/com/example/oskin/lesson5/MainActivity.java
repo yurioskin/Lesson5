@@ -1,8 +1,8 @@
 package com.example.oskin.lesson5;
 
-import android.animation.ValueAnimator;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.res.ColorStateList;
@@ -19,10 +19,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity {
+public class   MainActivity extends AppCompatActivity {
 
     private CustomBroadcastReceiver mCustomBroadcastReceiver;
+    private CustomBroadcastReceiver mStopServiceBroadcastReceiver;
     private IntentFilter mIntentFilter;
+    private IntentFilter mStopServiceFilter;
+
 
     private Messenger mService;
     private Messenger mMessenger = new Messenger(new IncomingHandler());
@@ -34,10 +37,10 @@ public class MainActivity extends AppCompatActivity {
     private TextView mSecondsTextView;
     private TextView mHoursAndMinutes;
 
-
     private Button mStarService;
     private Button mBindService;
     private Button mUnBindService;
+    private Button mStopService;
 
     private Button mRedBtn;
     private Button mBlueBtn;
@@ -54,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         initViews();
         initListeners();
-        init();
+        initBroadcastReceivers();
     }
 
     private void initViews() {
@@ -68,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
         mStarService = findViewById(R.id.linear_start_btn);
         mBindService = findViewById(R.id.bind_service_btn);
         mUnBindService = findViewById(R.id.linear_unbind_btn);
+        mStopService = findViewById(R.id.linear_stop_service_btn);
 
         mRedBtn = findViewById(R.id.red_btn);
         mBlueBtn = findViewById(R.id.blue_btn);
@@ -98,18 +102,28 @@ public class MainActivity extends AppCompatActivity {
                 unbindService();
             }
         });
+        mStopService.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                unbindService();
+                stopService(MyService.newIntent(MainActivity.this));
+            }
+        });
     }
 
 
-    private void init() {
-        mCustomBroadcastReceiver = new CustomBroadcastReceiver(new ViewCallbackColors());
+    private void initBroadcastReceivers() {
+        mCustomBroadcastReceiver = new CustomBroadcastReceiver(new ViewColorsCallback());
         mIntentFilter = new IntentFilter(MyService.CHANGE_COLOR);
+        mStopServiceBroadcastReceiver = new CustomBroadcastReceiver(new StopServiceCallback());
+        mStopServiceFilter = new IntentFilter(MyService.ACTION_STOP_SERVICE);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         registerReceiver(mCustomBroadcastReceiver, mIntentFilter,null, null);
+        registerReceiver(mStopServiceBroadcastReceiver, mStopServiceFilter,null, null);
     }
 
     public void bindService(){
@@ -135,7 +149,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         unregisterReceiver(mCustomBroadcastReceiver);
+        unregisterReceiver(mStopServiceBroadcastReceiver);
         unbindService();
+        stopService(MyService.newIntent(MainActivity.this));
 
     }
 
@@ -178,40 +194,55 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private class ViewCallbackColors implements ViewCallback{
+    private class ViewColorsCallback implements BroadcastCallback {
 
         @Override
-        public void collingBack(String nameColor, int color) {
-            changeColor(nameColor, color);
+        public void collingBack(Intent intent) {
+            String nameColor = intent.getStringExtra(MyService.NAME_COLOR);
+            int currentColor = intent.getIntExtra(MyService.CURRENT_COLOR,0);
+            changeTextAndBtnColor(nameColor, currentColor);
         }
     }
 
-    private void changeColor(String nameColor, int color){
+    private class StopServiceCallback implements BroadcastCallback {
+
+        @Override
+        public void collingBack(Intent intent) {
+            String stopService = getString(R.string.service_is_stopped);
+            changeTextAndBtnColor(stopService, 0);
+        }
+    }
+
+    private void changeTextAndBtnColor(String nameColor, int CurrentColor){
         mNameColorTextView.setText(nameColor);
+
         mRedBtn.setBackgroundTintList(ColorStateList.valueOf(Color.BLACK));
         mBlueBtn.setBackgroundTintList(ColorStateList.valueOf(Color.BLACK));
         mGreenBtn.setBackgroundTintList(ColorStateList.valueOf(Color.BLACK));
         mCyanBtn.setBackgroundTintList(ColorStateList.valueOf(Color.BLACK));
         mYellowBtn.setBackgroundTintList(ColorStateList.valueOf(Color.BLACK));
         mMagentaBtn.setBackgroundTintList(ColorStateList.valueOf(Color.BLACK));
-        switch (color){
+
+        switch (CurrentColor){
             case Color.RED:
-                mRedBtn.setBackgroundTintList(ColorStateList.valueOf(color));
+                mRedBtn.setBackgroundTintList(ColorStateList.valueOf(CurrentColor));
                 break;
             case Color.BLUE:
-                mBlueBtn.setBackgroundTintList(ColorStateList.valueOf(color));
+                mBlueBtn.setBackgroundTintList(ColorStateList.valueOf(CurrentColor));
                 break;
             case Color.CYAN:
-                mCyanBtn.setBackgroundTintList(ColorStateList.valueOf(color));
+                mCyanBtn.setBackgroundTintList(ColorStateList.valueOf(CurrentColor));
                 break;
             case Color.MAGENTA:
-                mMagentaBtn.setBackgroundTintList(ColorStateList.valueOf(color));
+                mMagentaBtn.setBackgroundTintList(ColorStateList.valueOf(CurrentColor));
                 break;
             case Color.YELLOW:
-                mYellowBtn.setBackgroundTintList(ColorStateList.valueOf(color));
+                mYellowBtn.setBackgroundTintList(ColorStateList.valueOf(CurrentColor));
                 break;
             case Color.GREEN:
-                mGreenBtn.setBackgroundTintList(ColorStateList.valueOf(color));
+                mGreenBtn.setBackgroundTintList(ColorStateList.valueOf(CurrentColor));
+                break;
+            default:
                 break;
         }
     }
