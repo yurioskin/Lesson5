@@ -51,11 +51,10 @@ public class MyService extends Service {
         public void run(){
             try {
                 for (; ;) {
-                    if (isInterrupted) {
-                        stopSelf();
+
+                    if (isInterrupted)
                         return;
-                    }
-                    
+
                     indexColor = mRandom.nextInt(6);
                     while (lastColor == indexColor){
                         indexColor = mRandom.nextInt(6);
@@ -83,11 +82,11 @@ public class MyService extends Service {
             try {
                 Message msg;
                 Date currentDate;
-                for (int i = 0; ; i++) {
-                    if (isInterrupted) {
-                        stopSelf();
+                for (; ;) {
+
+                    if (isInterrupted)
                         return;
-                    }
+
                     currentDate = Calendar.getInstance().getTime();
                     msg  = Message.obtain(null,MSG_CURRENT_VALUE,currentDate);
                     for (Messenger messenger:mClients) {
@@ -110,7 +109,6 @@ public class MyService extends Service {
         timeThread.start();
     }
 
-
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -118,8 +116,7 @@ public class MyService extends Service {
     }
 
     public static final Intent newIntent(Context context){
-        Intent intent = new Intent(context, MyService.class);
-        return intent;
+        return new Intent(context, MyService.class);
     }
 
     private class IncomingHandler extends Handler{
